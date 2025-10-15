@@ -1,979 +1,796 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>TimeTracker Pro</title>
-		<!-- Liens vers FontAwesome, Google Fonts, etc. à ajouter ici si besoin -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-		<style>
-			/* Tu pourras coller ici tout le CSS global si tu en as */
-		</style>
-	</head>
-	<body>
-		<button class="btn btn-secondary btn-lg" onclick="openEditTimes()" style="margin-left: 10px;">
-			<i class="fas fa-edit"></i>
-			Modifier horaires
-		</button>
-
-		<!-- Support Tab -->
-		<div id="support" class="tab-content">
-			<div class="card">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-life-ring"></i>
-						Support & Contact
-					</h3>
-				</div>
-
-				<div class="form-group">
-					<label class="form-label">Signaler un problème</label>
-					<textarea class="form-control" id="reportIssue" rows="4" placeholder="Décrivez votre problème ou votre question..."></textarea>
-				</div>
-
-				<button class="btn btn-lg" onclick="sendReport()">
-					<i class="fas fa-envelope"></i>
-					Envoyer le rapport
-				</button>
-
-				<div style="margin-top: 20px; padding: 16px; background: var(--gray-100); border-radius: 12px;">
-					<h4 style="margin-bottom: 12px; color: var(--text-primary);">Informations de contact</h4>
-					<p style="margin: 8px 0; color: var(--text-secondary);">
-						<i class="fas fa-envelope" style="margin-right: 8px;"></i>
-						<strong>Email :</strong> Ryan.monedero@sanofi.com
-					</p>
-					<p style="margin: 8px 0; color: var(--text-secondary);">
-						<i class="fab fa-linkedin" style="margin-right: 8px;"></i>
-						<strong>LinkedIn :</strong>
-						<a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank" style="color: var(--primary);">
-							Ryan MONEDERO
-						</a>
-					</p>
-					<p style="margin: 8px 0; color: var(--text-secondary);">
-						<i class="fas fa-code" style="margin-right: 8px;"></i>
-						<strong>Version :</strong> TimeTracker Pro v2.0.0
-					</p>
-				</div>
-			</div>
-		</div>
-
-		<!-- Me soutenir Tab -->
-		<div id="donate" class="tab-content">
-			<div class="card">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-heart"></i>
-						Soutenir le développement
-					</h3>
-				</div>
-
-				<div style="text-align: center; margin-bottom: 24px;">
-					<h4 style="margin-bottom: 12px; color: var(--text-primary);">Cette app vous fait gagner du temps ?</h4>
-					<p style="margin-bottom: 16px; color: var(--text-secondary);">
-						TimeTracker Pro v2 est développé bénévolement pour améliorer votre quotidien professionnel. Votre soutien m'aide à maintenir et améliorer l'application.
-					</p>
-				</div>
-				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px;">
-					<div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-						<i class="fas fa-clock" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-						<div style="font-weight: 600; margin-bottom: 4px;">Gain de temps</div>
-						<div style="font-size: 12px; color: var(--text-secondary);">Pointage automatisé</div>
-					</div>
-					<div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-						<i class="fas fa-chart-line" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-						<div style="font-weight: 600; margin-bottom: 4px;">Suivi précis</div>
-						<div style="font-size: 12px; color: var(--text-secondary);">Statistiques détaillées</div>
-					</div>
-					<div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-						<i class="fas fa-mobile-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-						<div style="font-weight: 600; margin-bottom: 4px;">PWA</div>
-						<div style="font-size: 12px; color: var(--text-secondary);">Utilisable hors-ligne</div>
-					</div>
-					<div style="background: var(--gray-100); padding: 16px; border-radius: 12px; text-align: center;">
-						<i class="fas fa-shield-alt" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-						<div style="font-weight: 600; margin-bottom: 4px;">Sécurisé</div>
-						<div style="font-size: 12px; color: var(--text-secondary);">Données locales</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Calendar Tab -->
-		<div id="calendar" class="tab-content">
-			<div class="card">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-calendar"></i>
-						Calendrier
-					</h3>
-					<div>
-						<button class="btn-icon" onclick="navigateCalendar(-1)">
-							<i class="fas fa-chevron-left"></i>
-						</button>
-						<span id="currentMonth" style="margin: 0 15px; font-weight: 600;"></span>
-						<button class="btn-icon" onclick="navigateCalendar(1)">
-							<i class="fas fa-chevron-right"></i>
-						</button>
-					</div>
-				</div>
-
-				<div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px;"></div>
-
-				<div style="display: flex; gap: 10px; flex-wrap: wrap;">
-					<button class="btn" onclick="openSpecialDayModal()">
-						<i class="fas fa-plus"></i>
-						Ajouter un jour
-					</button>
-					<button class="btn btn-secondary" onclick="openSpecialPeriodModal()">
-						<i class="fas fa-calendar-week"></i>
-						Ajouter une période
-					</button>
-				</div>
-				<div style="margin-top: 16px; padding: 12px; background: var(--gray-100); border-radius: 8px; font-size: 12px;">
-					<strong>Mode de sélection :</strong> Cliquez sur un jour pour voir les détails, ou utilisez "Ajouter une période" pour les semaines complètes.
-				</div>
-			</div>
-		</div>
-
-		<!-- Statistics Tab -->
-		<div id="statistics" class="tab-content">
-			<div class="card">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-chart-bar"></i>
-						Statistiques détaillées
-					</h3>
-				</div>
-
-				<div class="stats-grid">
-					<div class="stat-card">
-						<div class="stat-value" id="totalDaysWorked">0</div>
-						<div class="stat-label">Jours travaillés</div>
-					</div>
-					<div class="stat-card">
-						<div class="stat-value" id="averageDailyHours">0h00</div>
-						<div class="stat-label">Moyenne/jour</div>
-					</div>
-					<div class="stat-card">
-						<div class="stat-value" id="monthlyHours">0h00</div>
-						<div class="stat-label">Ce mois</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Export Tab -->
-		<div id="export" class="tab-content">
-			<div class="card">
-				<div class="card-header">
-					<h3 class="card-title">
-						<i class="fas fa-download"></i>
-						Export Excel
-					</h3>
-				</div>
-
-				<div class="form-group">
-					<label class="form-label">Période d'export</label>
-					<select class="form-control" id="exportPeriod">
-						<option value="week">Cette semaine</option>
-						<option value="month">Ce mois</option>
-						<option value="custom">Période personnalisée</option>
-					</select>
-				</div>
-
-				<div id="customPeriod" style="display: none;">
-					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-						<div class="form-group">
-							<label class="form-label">Du</label>
-							<input type="date" class="form-control" id="exportDateFrom" />
-						</div>
-						<div class="form-group">
-							<label class="form-label">Au</label>
-							<input type="date" class="form-control" id="exportDateTo" />
-						</div>
-					</div>
-				</div>
-
-				<div style="display: flex; gap: 10px;">
-					<button class="btn btn-lg" onclick="downloadExcel()">
-						<i class="fas fa-file-excel"></i>
-						Télécharger Excel
-					</button>
-					<button class="btn btn-secondary btn-lg" onclick="previewData()">
-						<i class="fas fa-eye"></i>
-						Aperçu
-					</button>
-				</div>
-
-				<div id="dataPreview" style="margin-top: 20px; display: none;"></div>
-			</div>
-		</div>
-
-		<!-- Footer -->
-		<div class="app-footer" style="position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); z-index: 1001;">
-			<p>
-				Développé par <a href="https://fr.linkedin.com/in/ryan-monedero-3b1122200" target="_blank">Ryan MONEDERO</a>
-				| TimeTracker Pro v2
-			</p>
-		</div>
-
-		<!-- Modals -->
-		<div id="editTimesModal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3 class="modal-title">Modifier les horaires</h3>
-					<button class="modal-close" onclick="closeModal('editTimesModal')">
-						<i class="fas fa-times"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label class="form-label">Date</label>
-						<input type="date" class="form-control" id="editDate" />
-					</div>
-					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-						<div class="form-group">
-							<label class="form-label">Arrivée</label>
-							<input type="time" class="form-control" id="editStartTime" />
-						</div>
-						<div class="form-group">
-							<label class="form-label">Départ</label>
-							<input type="time" class="form-control" id="editEndTime" />
-						</div>
-					</div>
-					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-						<div class="form-group">
-							<label class="form-label">Début pause</label>
-							<input type="time" class="form-control" id="editBreakStart" />
-						</div>
-						<div class="form-group">
-							<label class="form-label">Fin pause</label>
-							<input type="time" class="form-control" id="editBreakEnd" />
-						</div>
-					</div>
-					<div style="display: flex; gap: 10px;">
-						<button class="btn" onclick="saveEditedTimes()">
-							<i class="fas fa-save"></i>
-							Sauvegarder
-						</button>
-						<button class="btn btn-secondary" onclick="loadDayForEdit()">
-							<i class="fas fa-upload"></i>
-							Charger le jour
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div id="specialDayModal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3 class="modal-title">Ajouter un jour spécial</h3>
-					<button class="modal-close" onclick="closeModal('specialDayModal')">
-						<i class="fas fa-times"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label class="form-label">Date</label>
-						<input type="date" class="form-control" id="specialDate" />
-					</div>
-					<div class="form-group">
-						<label class="form-label">Type</label>
-						<select class="form-control" id="specialType">
-							<option value="conge">Congé</option>
-							<option value="maladie">Arrêt maladie</option>
-							<option value="ecole">Journée école</option>
-						</select>
-					</div>
-					<button class="btn btn-lg" onclick="saveSpecialDay()">
-						<i class="fas fa-save"></i>
-						Sauvegarder
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<div id="specialPeriodModal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3 class="modal-title">Ajouter une période</h3>
-					<button class="modal-close" onclick="closeModal('specialPeriodModal')">
-						<i class="fas fa-times"></i>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-						<label class="form-label">Date de début</label>
-						<input type="date" class="form-control" id="periodStartDate" />
-					</div>
-					<div class="form-group">
-						<label class="form-label">Date de fin</label>
-						<input type="date" class="form-control" id="periodEndDate" />
-					</div>
-					<div class="form-group">
-						<label class="form-label">Type</label>
-						<select class="form-control" id="periodType">
-							<option value="ecole">Semaine école</option>
-							<option value="conge">Congés</option>
-							<option value="maladie">Arrêt maladie</option>
-						</select>
-					</div>
-					<button class="btn btn-lg" onclick="saveSpecialPeriod()">
-						<i class="fas fa-save"></i>
-						Sauvegarder la période
-					</button>
-				</div>
-			</div>
-		</div>
-		<script>
-			class TimeTrackerV2 {
-			    constructor() {
-			        this.version = '2.0.0';
-			        this.workStatus = 'off';
-			        this.startTime = null;
-			        this.endTime = null;
-			        this.breakStartTime = null;
-			        this.breakEndTime = null;
-			        this.dailyHours = 7;
-			        this.weeklyGoal = 35;
-			        this.currentCalendarMonth = new Date();
-			        this.userProfile = this.loadUserProfile();
-			        this.settings = this.loadSettings();
-
-			        this.initializeApp();
-			    }
-
-			    initializeApp() {
-			        this.migrateData();
-			        this.loadData();
-			        this.initializeUI();
-			        this.bindEvents();
-			        this.updateDisplay();
-			        this.updateWelcomeMessage();
-			        this.requestNotificationPermission();
-
-			        setInterval(() => this.updateDisplay(), 1000);
-			        setInterval(() => this.checkNotifications(), 60000);
-			    }
-
-			    migrateData() {
-			        const oldData = localStorage.getItem('timeTrackerData');
-			        if (oldData && !localStorage.getItem('timeTrackerV2Data')) {
-			            const parsed = JSON.parse(oldData);
-			            localStorage.setItem('timeTrackerV2Data', JSON.stringify(parsed));
-			            console.log('Data migrated to v2');
-			        }
-			    }
-
-			    loadUserProfile() {
-			        return JSON.parse(localStorage.getItem('timeTrackerV2Profile') || JSON.stringify({
-			            firstName: '',
-			            lastName: '',
-			            status: 'alternant',
-			            photo: null
-			        }));
-			    }
-
-			    loadSettings() {
-			        return JSON.parse(localStorage.getItem('timeTrackerV2Settings') || JSON.stringify({
-			            theme: 'purple',
-			            darkMode: false,
-			            flexibleSchedule: false,
-			            dailyHours: 7,
-			            weeklyGoal: 35,
-			            notifications: true
-			        }));
-			    }
-
-			    loadData() {
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const today = new Date().toISOString().split('T')[0];
-			        const todayData = data[today] || {};
-
-			        this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
-			        this.endTime = todayData.endTime ? new Date(todayData.endTime) : null;
-			        this.breakStartTime = todayData.breakStartTime ? new Date(todayData.breakStartTime) : null;
-			        this.breakEndTime = todayData.breakEndTime ? new Date(todayData.breakEndTime) : null;
-
-			        this.dailyHours = this.settings.dailyHours;
-			        this.weeklyGoal = this.settings.weeklyGoal;
-
-			        this.updateWorkStatus();
-			    }
-
-			    saveData() {
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const today = new Date().toISOString().split('T')[0];
-
-			        data[today] = {
-			            startTime: this.startTime?.toISOString(),
-			            endTime: this.endTime?.toISOString(),
-			            breakStartTime: this.breakStartTime?.toISOString(),
-			            breakEndTime: this.breakEndTime?.toISOString(),
-			            totalHours: this.calculateTodayHours(),
-			            breakHours: this.calculateBreakHours(),
-			            skip15min: document.getElementById('skip15min')?.checked || false
-			        };
-
-			        localStorage.setItem('timeTrackerV2Data', JSON.stringify(data));
-			    }
-			    updateWorkStatus() {
-			        if (this.startTime && !this.endTime) {
-			            if (this.breakStartTime && !this.breakEndTime) {
-			                this.workStatus = 'break';
-			            } else {
-			                this.workStatus = 'working';
-			            }
-			        } else {
-			            this.workStatus = 'off';
-			        }
-			    }
-
-			    calculateTodayHours() {
-			        if (!this.startTime) return 0;
-
-			        const endTime = this.endTime || new Date();
-			        let totalMinutes = (endTime - this.startTime) / (1000 * 60);
-
-			        // Subtract break time (minimum 45 minutes for lunch)
-			        if (this.breakStartTime) {
-			            const breakEnd = this.breakEndTime || new Date();
-			            const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
-			            totalMinutes -= breakMinutes;
-			        }
-
-			        // Subtract 15 min daily break if checked
-			        const skip15min = document.getElementById('skip15min')?.checked;
-			        if (skip15min) {
-			            totalMinutes -= 15;
-			        }
-
-			        return Math.max(0, totalMinutes / 60);
-			    }
-
-			    calculateBreakHours() {
-			        if (!this.breakStartTime) return 0;
-
-			        const breakEnd = this.breakEndTime || new Date();
-			        return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60));
-			    }
-
-			    initializeUI() {
-			        this.applyTheme();
-
-			        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
-			            weekday: 'long',
-			            year: 'numeric',
-			            month: 'long',
-			            day: 'numeric'
-			        });
-
-			        this.renderCalendar();
-			        this.checkPWAInstall();
-			    }
-
-			    bindEvents() {
-			        document.getElementById('menuToggle').addEventListener('click', () => this.toggleSidebar());
-			        document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeSidebar());
-
-			        document.querySelectorAll('[data-tab]').forEach(btn => {
-			            btn.addEventListener('click', (e) => {
-			                const tab = e.target.dataset.tab || e.target.closest('[data-tab]').dataset.tab;
-			                this.switchTab(tab);
-			            });
-			        });
-
-			        document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
-			        document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
-			        document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
-			        document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
-
-			        document.getElementById('skip15min').addEventListener('change', () => {
-			            this.saveData();
-			            this.updateDisplay();
-			        });
-
-			        document.getElementById('themeToggle').addEventListener('click', () => this.showThemeSelector());
-
-			        document.getElementById('exportPeriod').addEventListener('change', (e) => {
-			            document.getElementById('customPeriod').style.display =
-			                e.target.value === 'custom' ? 'block' : 'none';
-			        });
-
-			        document.getElementById('profilePhoto').addEventListener('change', (e) => this.handleProfilePhoto(e));
-			    }
-			    toggleSidebar() {
-			        const sidebar = document.getElementById('sidebar');
-			        const overlay = document.getElementById('sidebarOverlay');
-
-			        sidebar.classList.toggle('active');
-			        overlay.classList.toggle('active');
-			    }
-
-			    closeSidebar() {
-			        document.getElementById('sidebar').classList.remove('active');
-			        document.getElementById('sidebarOverlay').classList.remove('active');
-			    }
-
-			    switchTab(tabName) {
-			        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-			        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-			        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-			        document.getElementById(tabName).classList.add('active');
-
-			        this.closeSidebar();
-
-			        if (tabName === 'statistics') this.updateStatistics();
-			        if (tabName === 'calendar') this.renderCalendar();
-			    }
-
-			    handleStart() {
-			        if (this.workStatus === 'off') {
-			            this.startTime = new Date();
-			            this.endTime = null;
-			            this.workStatus = 'working';
-			            this.saveData();
-			            this.updateDisplay();
-			            this.showNotification(this.getPersonalizedMessage('start'), 'Bonne journée !');
-			        }
-			    }
-
-			    handleEnd() {
-			        if (this.workStatus === 'working' || this.workStatus === 'break') {
-			            if (this.workStatus === 'break') {
-			                this.handleBreakEnd();
-			            }
-
-			            this.endTime = new Date();
-			            this.workStatus = 'off';
-			            this.saveData();
-			            this.updateDisplay();
-
-			            const totalHours = this.calculateTodayHours();
-			            this.showNotification(this.getPersonalizedMessage('end'),
-			                `${totalHours.toFixed(1)}h travaillées aujourd'hui`);
-			        }
-			    }
-
-			    handleBreakStart() {
-			        if (this.workStatus === 'working') {
-			            this.breakStartTime = new Date();
-			            this.breakEndTime = null;
-			            this.workStatus = 'break';
-			            this.saveData();
-			            this.updateDisplay();
-			            this.showNotification(this.getPersonalizedMessage('break'), 'Bon appétit !');
-			        }
-			    }
-
-			    handleBreakEnd() {
-			        if (this.workStatus === 'break') {
-			            this.breakEndTime = new Date();
-			            this.workStatus = 'working';
-			            this.saveData();
-			            this.updateDisplay();
-
-			            const breakDuration = Math.max(45, (this.breakEndTime - this.breakStartTime) / (1000 * 60));
-			            this.showNotification('Pause terminée', `${Math.round(breakDuration)} minutes de pause`);
-			        }
-			    }
-			    getPersonalizedMessage(type) {
-			        const name = this.userProfile.firstName || 'Collègue';
-			        const messages = {
-			            start: `Bon travail ${name} !`,
-			            break: `Bon appétit ${name} !`,
-			            end: `Bonne soirée ${name} !`
-			        };
-			        return messages[type] || 'TimeTracker Pro';
-			    }
-
-			    updateDisplay() {
-			        this.updateStatus();
-			        this.updateButtons();
-			        this.updateTimes();
-			        this.updateStats();
-			        this.updateProgress();
-			    }
-
-			    updateStatus() {
-			        const statusDot = document.getElementById('statusDot');
-			        const statusText = document.getElementById('statusText');
-
-			        statusDot.className = 'status-dot';
-
-			        switch (this.workStatus) {
-			            case 'working':
-			                statusDot.classList.add('working');
-			                statusText.textContent = 'En service';
-			                break;
-			            case 'break':
-			                statusDot.classList.add('break');
-			                statusText.textContent = 'En pause';
-			                break;
-			            default:
-			                statusDot.classList.add('off');
-			                statusText.textContent = 'Hors service';
-			        }
-			    }
-
-			    updateButtons() {
-			        const buttons = {
-			            start: document.getElementById('startBtn'),
-			            end: document.getElementById('endBtn'),
-			            breakStart: document.getElementById('breakStartBtn'),
-			            breakEnd: document.getElementById('breakEndBtn')
-			        };
-
-			        Object.values(buttons).forEach(btn => {
-			            btn.classList.remove('active');
-			            btn.classList.remove('primary');
-			        });
-
-			        switch (this.workStatus) {
-			            case 'working':
-			                buttons.start.classList.add('active');
-			                buttons.end.classList.add('primary');
-			                buttons.breakStart.classList.add('primary');
-			                break;
-			            case 'break':
-			                buttons.breakStart.classList.add('active');
-			                buttons.breakEnd.classList.add('primary');
-			                buttons.end.classList.add('primary');
-			                break;
-			            default:
-			                buttons.start.classList.add('primary');
-			        }
-			    }
-
-			    updateTimes() {
-			        document.getElementById('startTime').textContent =
-			            this.startTime ? this.formatTime(this.startTime) : '';
-			        document.getElementById('endTime').textContent =
-			            this.endTime ? this.formatTime(this.endTime) : '';
-			        document.getElementById('breakStartTime').textContent =
-			            this.breakStartTime ? this.formatTime(this.breakStartTime) : '';
-			        document.getElementById('breakEndTime').textContent =
-			            this.breakEndTime ? this.formatTime(this.breakEndTime) : '';
-			    }
-			    updateStats() {
-			        const todayHours = this.calculateTodayHours();
-			        const weekHours = this.calculateWeekHours();
-			        const remainingHours = Math.max(0, this.weeklyGoal - weekHours);
-
-			        document.getElementById('todayHours').textContent = this.formatHours(todayHours);
-			        document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
-			        document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
-			    }
-
-			    updateProgress() {
-			        const todayHours = this.calculateTodayHours();
-			        const progress = Math.min(100, (todayHours / this.dailyHours) * 100);
-
-			        document.getElementById('dayProgress').textContent =
-			            `${this.formatHours(todayHours)} / ${this.dailyHours}h00`;
-			        document.getElementById('dayProgressBar').style.width = `${progress}%`;
-			    }
-
-			    calculateWeekHours() {
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const now = new Date();
-			        const startOfWeek = new Date(now);
-			        startOfWeek.setDate(now.getDate() - now.getDay() + 1);
-			        startOfWeek.setHours(0, 0, 0, 0);
-
-			        let totalHours = 0;
-			        for (let i = 0; i < 7; i++) {
-			            const date = new Date(startOfWeek);
-			            date.setDate(startOfWeek.getDate() + i);
-			            const dateStr = date.toISOString().split('T')[0];
-
-			            if (data[dateStr]) {
-			                totalHours += data[dateStr].totalHours || 0;
-			            }
-
-			            const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-			            if (specialDays[dateStr]) {
-			                totalHours += 7;
-			            }
-			        }
-
-			        return totalHours;
-			    }
-
-			    updateWelcomeMessage() {
-			        const nameEl = document.getElementById('welcomeName');
-			        const roleEl = document.getElementById('welcomeRole');
-			        const avatarEl = document.getElementById('profileAvatar');
-
-			        if (this.userProfile.firstName) {
-			            nameEl.textContent = `Bonjour ${this.userProfile.firstName} !`;
-			        } else {
-			            nameEl.textContent = 'Bonjour !';
-			        }
-
-			        roleEl.textContent = this.userProfile.status.charAt(0).toUpperCase() + this.userProfile.status.slice(1);
-
-			        if (this.userProfile.photo) {
-			            avatarEl.innerHTML = `<img src="${this.userProfile.photo}" alt="Photo de profil">`;
-			        } else {
-			            avatarEl.innerHTML = `<i class="fas fa-user"></i>`;
-			        }
-			    }
-
-			    formatTime(date) {
-			        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-			    }
-
-			    formatHours(hours) {
-			        const h = Math.floor(hours);
-			        const m = Math.round((hours - h) * 60);
-			        return `${h}h${m.toString().padStart(2, '0')}`;
-			    }
-			    showNotification(title, message) {
-			        if (!this.settings.notifications) return;
-
-			        const notification = document.createElement('div');
-			        notification.className = 'notification';
-			        notification.innerHTML = `
-			            <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
-			            <div style="opacity: 0.9;">${message}</div>
-			        `;
-
-			        document.body.appendChild(notification);
-
-			        setTimeout(() => {
-			            notification.style.animation = 'slideOut 0.3s ease';
-			            setTimeout(() => document.body.removeChild(notification), 300);
-			        }, 4000);
-			    }
-
-			    checkNotifications() {
-			        if (this.workStatus === 'working') {
-			            const todayHours = this.calculateTodayHours();
-
-			            if (todayHours >= 7 && !this.notified7Hours) {
-			                this.showNotification('🎯 Objectif atteint !',
-			                    `Vous avez travaillé ${this.formatHours(todayHours)} aujourd'hui`);
-			                this.notified7Hours = true;
-			            }
-
-			            const workTime = (new Date() - this.startTime) / (1000 * 60 * 60);
-			            if (workTime > 4 && !this.breakStartTime && !this.notifiedBreak) {
-			                this.showNotification('Pause recommandée',
-			                    'Vous travaillez depuis plus de 4h. Pensez à prendre une pause !');
-			                this.notifiedBreak = true;
-			            }
-			        }
-
-			        const now = new Date();
-			        if (now.getHours() === 0 && now.getMinutes() === 0) {
-			            this.notified7Hours = false;
-			            this.notifiedBreak = false;
-			        }
-			    }
-
-			    applyTheme() {
-			        switch (this.settings.theme) {
-			            case 'blue':
-			                document.body.setAttribute('data-theme', 'blue');
-			                break;
-			            case 'green':
-			                document.body.setAttribute('data-theme', 'green');
-			                break;
-			            default:
-			                document.body.removeAttribute('data-theme');
-			        }
-
-			        if (this.settings.darkMode) {
-			            document.body.setAttribute('data-theme', 'dark');
-			        }
-
-			        if (document.getElementById('colorTheme')) {
-			            document.getElementById('colorTheme').value = this.settings.theme;
-			            document.getElementById('darkMode').checked = this.settings.darkMode;
-			            document.getElementById('flexibleSchedule').checked = this.settings.flexibleSchedule;
-			            document.getElementById('dailyHours').value = this.settings.dailyHours;
-			            document.getElementById('weeklyGoal').value = this.settings.weeklyGoal;
-			            document.getElementById('notificationsEnabled').checked = this.settings.notifications;
-			        }
-			    }
-			    showThemeSelector() {
-			        const themes = ['purple', 'blue', 'green'];
-			        const currentTheme = this.settings.theme;
-			        const nextThemeIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
-
-			        this.settings.theme = themes[nextThemeIndex];
-			        localStorage.setItem('timeTrackerV2Settings', JSON.stringify(this.settings));
-			        this.applyTheme();
-
-			        this.showNotification('Thème changé',
-			            `Thème ${themes[nextThemeIndex]} appliqué`);
-			    }
-
-			    handleProfilePhoto(event) {
-			        const file = event.target.files[0];
-			        if (file) {
-			            const reader = new FileReader();
-			            reader.onload = (e) => {
-			                this.userProfile.photo = e.target.result;
-			                this.saveProfile();
-			                this.updateWelcomeMessage();
-			            };
-			            reader.readAsDataURL(file);
-			        }
-			    }
-
-			    saveProfile() {
-			        localStorage.setItem('timeTrackerV2Profile', JSON.stringify(this.userProfile));
-			    }
-
-			    renderCalendar() {
-			        const month = this.currentCalendarMonth;
-			        document.getElementById('currentMonth').textContent =
-			            month.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-
-			        const grid = document.getElementById('calendarGrid');
-			        grid.innerHTML = '';
-
-			        const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-			        dayHeaders.forEach(day => {
-			            const header = document.createElement('div');
-			            header.style.cssText = `
-			                padding: 8px; text-align: center; font-weight: 600;
-			                color: var(--text-secondary); font-size: 12px;
-			            `;
-			            header.textContent = day;
-			            grid.appendChild(header);
-			        });
-
-			        const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
-			        const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
-			        const daysInMonth = lastDay.getDate();
-			        const startingDayOfWeek = (firstDay.getDay() + 6) % 7;
-
-			        for (let i = 0; i < startingDayOfWeek; i++) {
-			            grid.appendChild(document.createElement('div'));
-			        }
-
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-
-			        for (let day = 1; day <= daysInMonth; day++) {
-			            const dayElement = document.createElement('div');
-			            // Fix timezone issue - create date in local timezone
-			            const localDate = new Date(month.getFullYear(), month.getMonth(), day);
-			            const dateStr = localDate.getFullYear() + '-' +
-			                String(localDate.getMonth() + 1).padStart(2, '0') + '-' +
-			                String(localDate.getDate()).padStart(2, '0');
-
-			            dayElement.style.cssText = `
-			                aspect-ratio: 1; border: 1px solid var(--border-color);
-			                border-radius: 8px; display: flex; flex-direction: column;
-			                align-items: center; justify-content: center; font-size: 12px;
-			                cursor: pointer; transition: all 0.3s ease; padding: 4px;
-			            `;
-
-			            dayElement.textContent = day;
-
-			            // Today - using local date comparison
-			            const today = new Date();
-			            const todayStr = today.getFullYear() + '-' +
-			                String(today.getMonth() + 1).padStart(2, '0') + '-' +
-			                String(today.getDate()).padStart(2, '0');
-
-			            if (dateStr === todayStr) {
-			                dayElement.style.background = 'var(--primary)';
-			                dayElement.style.color = 'white';
-			            }
-
-			            if (data[dateStr] && data[dateStr].totalHours > 0) {
-			                dayElement.style.borderColor = 'var(--success)';
-			                dayElement.style.background = 'var(--success)';
-			                dayElement.style.color = 'white';
-
-			                const hours = document.createElement('div');
-			                hours.style.fontSize = '10px';
-			                hours.textContent = this.formatHours(data[dateStr].totalHours);
-			                dayElement.appendChild(hours);
-			            }
-
-			            // Special days - with delete option
-			            if (specialDays[dateStr]) {
-			                dayElement.style.borderColor = 'var(--warning)';
-			                dayElement.style.background = 'var(--warning)';
-			                dayElement.style.color = 'white';
-
-			                const type = document.createElement('div');
-			                type.style.fontSize = '10px';
-			                type.textContent = specialDays[dateStr].type;
-			                dayElement.appendChild(type);
-			            }
-
-			            dayElement.addEventListener('click', () => this.showDayDetails(dateStr));
-			            grid.appendChild(dayElement);
-			        }
-			    }
-			    showDayDetails(dateStr) {
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-			        const dayData = data[dateStr];
-			        const specialDay = specialDays[dateStr];
-
-			        // Create local date from dateStr to avoid timezone issues
-			        const [year, month, day] = dateStr.split('-').map(Number);
-			        const localDate = new Date(year, month - 1, day);
-			        let details = `📅 ${localDate.toLocaleDateString('fr-FR')}\n\n`;
-
-			        if (specialDay) {
-			            details += `${specialDay.type.toUpperCase()} - 7h comptabilisées automatiquement\n\n`;
-			            details += `Voulez-vous supprimer ce jour spécial ?`;
-
-			            if (confirm(details)) {
-			                this.deleteSpecialDay(dateStr);
-			            }
-			        } else if (dayData && dayData.totalHours > 0) {
-			            details += `Heures travaillées: ${this.formatHours(dayData.totalHours)}\n`;
-			            if (dayData.startTime) details += `Arrivée: ${this.formatTime(new Date(dayData.startTime))}\n`;
-			            if (dayData.endTime) details += `Départ: ${this.formatTime(new Date(dayData.endTime))}\n`;
-			            if (dayData.breakHours > 0) details += `Pause: ${this.formatHours(dayData.breakHours)}`;
-			            alert(details);
-			        } else {
-			            details += 'Aucune donnée pour ce jour';
-			            alert(details);
-			        }
-			    }
-
-			    deleteSpecialDay(dateStr) {
-			        const specialDays = JSON.parse(localStorage.getItem('timeTrackerV2SpecialDays') || '{}');
-			        const dayType = specialDays[dateStr]?.type || 'jour spécial';
-
-			        delete specialDays[dateStr];
-			        localStorage.setItem('timeTrackerV2SpecialDays', JSON.stringify(specialDays));
-
-			        this.renderCalendar();
-			        this.showNotification('Jour supprimé', `${dayType} supprimé avec succès`);
-			    }
-
-			    updateStatistics() {
-			        const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-			        const dates = Object.keys(data).sort();
-
-			        const daysWorked = dates.filter(date => data[date].totalHours > 0).length;
-			        const totalHours = dates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
-			        const avgHours = daysWorked > 0 ? totalHours / daysWorked : 0;
-
-			        const currentMonth = new Date().toISOString().substr(0, 7);
-			        const monthDates = dates.filter(date => date.startsWith(currentMonth));
-			        const monthHours = monthDates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
-
-			        document.getElementById('totalDaysWorked').textContent = daysWorked;
-			        document.getElementById('averageDailyHours').textContent = this.formatHours(avgHours);
-			        document.getElementById('monthlyHours').textContent = this.formatHours(monthHours);
-			    }
-			}
-		</script>
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeTracker Pro v2.0.0</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5A96">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8B5A96;
+            --primary-dark: #6B4476;
+            --primary-light: #B087C4;
+            --secondary: #2C3E50;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --text-primary: #212529;
+            --text-secondary: #6C757D;
+            --border-color: #DEE2E6;
+            --gray-100: #F8F9FA;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar {
+            background: var(--bg-primary);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-content {
+            margin-top: 60px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .punch-btn {
+            min-height: 80px;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid var(--border-color);
+        }
+
+        .punch-btn.primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            bottom: 0;
+            width: 250px;
+            background: var(--bg-primary);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            z-index: 999;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: gray;
+        }
+
+        .status-dot.working {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.break {
+            background: var(--warning);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 60px auto;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 250px;
+            }
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <i class="fas fa-clock"></i>
+            TimeTracker Pro v2.0.0
+        </div>
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tab="home">
+                <i class="fas fa-home"></i>
+                Accueil
+            </button>
+            <button class="nav-item" data-tab="calendar">
+                <i class="fas fa-calendar"></i>
+                Calendrier
+            </button>
+            <button class="nav-item" data-tab="statistics">
+                <i class="fas fa-chart-bar"></i>
+                Statistiques
+            </button>
+            <button class="nav-item" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                Paramètres
+            </button>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="container">
+            <div id="home" class="tab-content active">
+                <div class="card">
+                    <h2>Bonjour !</h2>
+                    <div class="status-indicator">
+                        <div class="status-dot off" id="statusDot"></div>
+                        <span id="statusText">Hors service</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Pointage</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+                        <button class="punch-btn primary" id="startBtn">
+                            <i class="fas fa-play"></i>
+                            <span>ARRIVÉE</span>
+                            <span id="startTime"></span>
+                        </button>
+                        <button class="punch-btn" id="endBtn">
+                            <i class="fas fa-stop"></i>
+                            <span>DÉPART</span>
+                            <span id="endTime"></span>
+                        </button>
+                        <button class="punch-btn" id="breakStartBtn">
+                            <i class="fas fa-pause"></i>
+                            <span>PAUSE</span>
+                            <span id="breakStartTime"></span>
+                        </button>
+                        <button class="punch-btn" id="breakEndBtn">
+                            <i class="fas fa-play"></i>
+                            <span>REPRISE</span>
+                            <span id="breakEndTime"></span>
+                        </button>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <label>
+                            <input type="checkbox" id="skip15min" checked>
+                            Pause 15 min prise
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="dayProgressBar" style="width: 0%"></div>
+                    </div>
+                    <p id="dayProgress" style="margin-top: 8px; text-align: center;">0h00 / 7h00</p>
+                </div>
+
+                <div class="card">
+                    <h3>Statistiques</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="todayHours">0h00</div>
+                            <div class="stat-label">Aujourd'hui</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="weekHours">0h00/35h</div>
+                            <div class="stat-label">Cette semaine</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="remainingHours">35h00</div>
+                            <div class="stat-label">Restant</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendar" class="tab-content">
+                <div class="card">
+                    <h3>Calendrier</h3>
+                    <div id="calendarGrid"></div>
+                </div>
+            </div>
+
+            <div id="statistics" class="tab-content">
+                <div class="card">
+                    <h3>Statistiques détaillées</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDaysWorked">0</div>
+                            <div class="stat-label">Jours travaillés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="averageDailyHours">0h00</div>
+                            <div class="stat-label">Moyenne/jour</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="monthlyHours">0h00</div>
+                            <div class="stat-label">Ce mois</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <h3>Paramètres</h3>
+                    <div class="form-group">
+                        <label class="form-label">Heures par jour</label>
+                        <input type="number" class="form-control" id="dailyHours" value="7" min="1" max="12" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Objectif hebdomadaire</label>
+                        <input type="number" class="form-control" id="weeklyGoal" value="35" min="1" max="50" step="0.5">
+                    </div>
+                    <button class="btn" onclick="saveSettings()">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        class TimeTrackerV2 {
+            constructor() {
+                this.version = '2.0.0';
+                this.workStatus = 'off';
+                this.startTime = null;
+                this.endTime = null;
+                this.breakStartTime = null;
+                this.breakEndTime = null;
+                this.dailyHours = 7;
+                this.weeklyGoal = 35;
+                this.settings = this.loadSettings();
+                
+                this.initializeApp();
+            }
+
+            initializeApp() {
+                this.loadData();
+                this.initializeUI();
+                this.bindEvents();
+                this.updateDisplay();
+                
+                setInterval(() => this.updateDisplay(), 1000);
+            }
+
+            loadSettings() {
+                return JSON.parse(localStorage.getItem('timeTrackerV2Settings') || JSON.stringify({
+                    theme: 'purple',
+                    darkMode: false,
+                    dailyHours: 7,
+                    weeklyGoal: 35,
+                    notifications: true
+                }));
+            }
+
+            loadData() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
+                const today = new Date().toISOString().split('T')[0];
+                const todayData = data[today] || {};
+                
+                this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
+                this.endTime = todayData.endTime ? new Date(todayData.endTime) : null;
+                this.breakStartTime = todayData.breakStartTime ? new Date(todayData.breakStartTime) : null;
+                this.breakEndTime = todayData.breakEndTime ? new Date(todayData.breakEndTime) : null;
+                
+                this.dailyHours = this.settings.dailyHours;
+                this.weeklyGoal = this.settings.weeklyGoal;
+                
+                this.updateWorkStatus();
+            }
+
+            saveData() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
+                const today = new Date().toISOString().split('T')[0];
+                
+                data[today] = {
+                    startTime: this.startTime?.toISOString(),
+                    endTime: this.endTime?.toISOString(),
+                    breakStartTime: this.breakStartTime?.toISOString(),
+                    breakEndTime: this.breakEndTime?.toISOString(),
+                    totalHours: this.calculateTodayHours(),
+                    breakHours: this.calculateBreakHours(),
+                    skip15min: document.getElementById('skip15min')?.checked || false
+                };
+                
+                localStorage.setItem('timeTrackerV2Data', JSON.stringify(data));
+            }
+
+            updateWorkStatus() {
+                if (this.startTime && !this.endTime) {
+                    if (this.breakStartTime && !this.breakEndTime) {
+                        this.workStatus = 'break';
+                    } else {
+                        this.workStatus = 'working';
+                    }
+                } else {
+                    this.workStatus = 'off';
+                }
+            }
+
+            calculateTodayHours() {
+                if (!this.startTime) return 0;
+                
+                const endTime = this.endTime || new Date();
+                let totalMinutes = (endTime - this.startTime) / (1000 * 60);
+                
+                if (this.breakStartTime) {
+                    const breakEnd = this.breakEndTime || new Date();
+                    const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
+                    totalMinutes -= breakMinutes;
+                }
+                
+                const skip15min = document.getElementById('skip15min')?.checked;
+                if (skip15min) {
+                    totalMinutes -= 15;
+                }
+                
+                return Math.max(0, totalMinutes / 60);
+            }
+
+            calculateBreakHours() {
+                if (!this.breakStartTime) return 0;
+                const breakEnd = this.breakEndTime || new Date();
+                return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60));
+            }
+
+            initializeUI() {
+                this.applyTheme();
+            }
+
+            bindEvents() {
+                document.getElementById('menuToggle')?.addEventListener('click', () => this.toggleSidebar());
+                
+                document.querySelectorAll('[data-tab]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab || e.target.closest('[data-tab]').dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+                
+                document.getElementById('startBtn').addEventListener('click', () => this.handleStart());
+                document.getElementById('endBtn').addEventListener('click', () => this.handleEnd());
+                document.getElementById('breakStartBtn').addEventListener('click', () => this.handleBreakStart());
+                document.getElementById('breakEndBtn').addEventListener('click', () => this.handleBreakEnd());
+                
+                document.getElementById('skip15min')?.addEventListener('change', () => {
+                    this.saveData();
+                    this.updateDisplay();
+                });
+            }
+
+            toggleSidebar() {
+                document.getElementById('sidebar').classList.toggle('active');
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+                
+                if (tabName === 'statistics') this.updateStatistics();
+            }
+            handleStart() {
+                if (this.workStatus === 'off') {
+                    this.startTime = new Date();
+                    this.endTime = null;
+                    this.workStatus = 'working';
+                    this.saveData();
+                    this.updateDisplay();
+                    alert('Bonne journée !');
+                }
+            }
+
+            handleEnd() {
+                if (this.workStatus === 'working' || this.workStatus === 'break') {
+                    if (this.workStatus === 'break') {
+                        this.handleBreakEnd();
+                    }
+                    
+                    this.endTime = new Date();
+                    this.workStatus = 'off';
+                    this.saveData();
+                    this.updateDisplay();
+                    
+                    const totalHours = this.calculateTodayHours();
+                    alert(`${totalHours.toFixed(1)}h travaillées aujourd'hui`);
+                }
+            }
+
+            handleBreakStart() {
+                if (this.workStatus === 'working') {
+                    this.breakStartTime = new Date();
+                    this.breakEndTime = null;
+                    this.workStatus = 'break';
+                    this.saveData();
+                    this.updateDisplay();
+                    alert('Bon appétit !');
+                }
+            }
+
+            handleBreakEnd() {
+                if (this.workStatus === 'break') {
+                    this.breakEndTime = new Date();
+                    this.workStatus = 'working';
+                    this.saveData();
+                    this.updateDisplay();
+                }
+            }
+
+            updateDisplay() {
+                this.updateStatus();
+                this.updateButtons();
+                this.updateTimes();
+                this.updateStats();
+                this.updateProgress();
+            }
+
+            updateStatus() {
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+                
+                statusDot.className = 'status-dot';
+                
+                switch (this.workStatus) {
+                    case 'working':
+                        statusDot.classList.add('working');
+                        statusText.textContent = 'En service';
+                        break;
+                    case 'break':
+                        statusDot.classList.add('break');
+                        statusText.textContent = 'En pause';
+                        break;
+                    default:
+                        statusDot.classList.add('off');
+                        statusText.textContent = 'Hors service';
+                }
+            }
+
+            updateButtons() {
+                const buttons = {
+                    start: document.getElementById('startBtn'),
+                    end: document.getElementById('endBtn'),
+                    breakStart: document.getElementById('breakStartBtn'),
+                    breakEnd: document.getElementById('breakEndBtn')
+                };
+                
+                Object.values(buttons).forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('primary');
+                });
+                
+                switch (this.workStatus) {
+                    case 'working':
+                        buttons.start.classList.add('active');
+                        buttons.end.classList.add('primary');
+                        buttons.breakStart.classList.add('primary');
+                        break;
+                    case 'break':
+                        buttons.breakStart.classList.add('active');
+                        buttons.breakEnd.classList.add('primary');
+                        buttons.end.classList.add('primary');
+                        break;
+                    default:
+                        buttons.start.classList.add('primary');
+                }
+            }
+
+            updateTimes() {
+                document.getElementById('startTime').textContent =
+                    this.startTime ? this.formatTime(this.startTime) : '';
+                document.getElementById('endTime').textContent =
+                    this.endTime ? this.formatTime(this.endTime) : '';
+                document.getElementById('breakStartTime').textContent =
+                    this.breakStartTime ? this.formatTime(this.breakStartTime) : '';
+                document.getElementById('breakEndTime').textContent =
+                    this.breakEndTime ? this.formatTime(this.breakEndTime) : '';
+            }
+
+            updateStats() {
+                const todayHours = this.calculateTodayHours();
+                const weekHours = this.calculateWeekHours();
+                const remainingHours = Math.max(0, this.weeklyGoal - weekHours);
+
+                document.getElementById('todayHours').textContent = this.formatHours(todayHours);
+                document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
+                document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
+            }
+
+            updateProgress() {
+                const todayHours = this.calculateTodayHours();
+                const progress = Math.min(100, (todayHours / this.dailyHours) * 100);
+                
+                document.getElementById('dayProgress').textContent =
+                    `${this.formatHours(todayHours)} / ${this.dailyHours}h00`;
+                document.getElementById('dayProgressBar').style.width = `${progress}%`;
+            }
+
+            calculateWeekHours() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
+                const now = new Date();
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+                startOfWeek.setHours(0, 0, 0, 0);
+
+                let totalHours = 0;
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(startOfWeek);
+                    date.setDate(startOfWeek.getDate() + i);
+                    const dateStr = date.toISOString().split('T')[0];
+
+                    if (data[dateStr]) {
+                        totalHours += data[dateStr].totalHours || 0;
+                    }
+                }
+
+                return totalHours;
+            }
+
+            updateStatistics() {
+                const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
+                const dates = Object.keys(data).sort();
+                
+                const daysWorked = dates.filter(date => data[date].totalHours > 0).length;
+                const totalHours = dates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
+                const avgHours = daysWorked > 0 ? totalHours / daysWorked : 0;
+                
+                const currentMonth = new Date().toISOString().substr(0, 7);
+                const monthDates = dates.filter(date => date.startsWith(currentMonth));
+                const monthHours = monthDates.reduce((sum, date) => sum + (data[date].totalHours || 0), 0);
+                
+                document.getElementById('totalDaysWorked').textContent = daysWorked;
+                document.getElementById('averageDailyHours').textContent = this.formatHours(avgHours);
+                document.getElementById('monthlyHours').textContent = this.formatHours(monthHours);
+            }
+
+            formatTime(date) {
+                return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            formatHours(hours) {
+                const h = Math.floor(hours);
+                const m = Math.round((hours - h) * 60);
+                return `${h}h${m.toString().padStart(2, '0')}`;
+            }
+
+            applyTheme() {
+                // Theme application logic
+            }
+        }
+
+        // Global functions
+        function saveSettings() {
+            const settings = {
+                theme: 'purple',
+                darkMode: false,
+                dailyHours: parseFloat(document.getElementById('dailyHours').value),
+                weeklyGoal: parseFloat(document.getElementById('weeklyGoal').value),
+                notifications: true
+            };
+            
+            window.timeTracker.settings = settings;
+            window.timeTracker.dailyHours = settings.dailyHours;
+            window.timeTracker.weeklyGoal = settings.weeklyGoal;
+            
+            localStorage.setItem('timeTrackerV2Settings', JSON.stringify(settings));
+            window.timeTracker.updateDisplay();
+            alert('Paramètres sauvegardés');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            window.timeTracker = new TimeTrackerV2();
+        });
+    </script>
+</body>
 </html>
