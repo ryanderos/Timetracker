@@ -375,7 +375,15 @@
                 setInterval(() => this.updateDisplay(), 1000);
                 setInterval(() => this.checkNotifications(), 60000);
             }
-
+          
+            // Helper: Format date en local (évite décalage timezone)
+            formatDateToLocal(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+              
             migrateData() {
                 const oldData = localStorage.getItem('timeTrackerData');
                 if (oldData && !localStorage.getItem('timeTrackerV2Data')) {
@@ -407,7 +415,7 @@
 
             loadData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-                const today = new Date().toISOString().split('T')[0];
+                const today = this.formatDateToLocal(new Date());
                 const todayData = data[today] || {};
                
                 this.startTime = todayData.startTime ? new Date(todayData.startTime) : null;
@@ -423,7 +431,7 @@
 
             saveData() {
                 const data = JSON.parse(localStorage.getItem('timeTrackerV2Data') || '{}');
-                const today = new Date().toISOString().split('T')[0];
+                const today = this.formatDateToLocal(new Date());
                
                 data[today] = {
                     startTime: this.startTime?.toISOString(),
@@ -1291,7 +1299,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.href = url;
-            link.download = `timetracker_${period}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `timetracker_${period}_${this.formatDateToLocal(new Date())}.csv`;
             link.click();
             URL.revokeObjectURL(url);
            
