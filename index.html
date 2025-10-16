@@ -715,10 +715,10 @@
                 startOfWeek.setHours(0, 0, 0, 0);
                
                 let totalHours = 0;
-                for (let i = 0; i < 7; i++) {
+                for (let i = 0; i < 5; i++) {  // Lun-Ven uniquement
                     const date = new Date(startOfWeek);
                     date.setDate(startOfWeek.getDate() + i);
-                    const dateStr = date.toISOString().split('T')[0];
+                    const dateStr = this.formatDateToLocal(date);
                    
                     if (data[dateStr]) {
                         totalHours += data[dateStr].totalHours || 0;
