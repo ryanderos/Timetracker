@@ -486,6 +486,27 @@
                 const breakEnd = this.breakEndTime || new Date();
                 return Math.max(0.75, (breakEnd - this.breakStartTime) / (1000 * 60 * 60));
             }
+            // Calcul des heures projetées en temps réel (pendant la journée)
+            calculateProjectedHours() {
+                if (!this.startTime || this.endTime) return this.calculateTodayHours();
+                
+                const now = new Date();
+                let totalMinutes = (now - this.startTime) / (1000 * 60);
+                
+                // Déduire la pause déjeuner (min 45 min)
+                if (this.breakStartTime) {
+                    const breakEnd = this.breakEndTime || now;
+                    const breakMinutes = Math.max(45, (breakEnd - this.breakStartTime) / (1000 * 60));
+                    totalMinutes -= breakMinutes;
+                }
+                
+                // Déduire les 15 min si cochées
+                const skip15min = document.getElementById('skip15min')?.checked;
+                if (skip15min) totalMinutes -= 15;
+                
+                return Math.max(0, totalMinutes / 60);
+            }
+
 
             initializeUI() {
                 this.applyTheme();
@@ -689,14 +710,23 @@
             }
 
             updateStats() {
-                const todayHours = this.calculateTodayHours();
-                const weekHours = this.calculateWeekHours();
-                const remainingHours = Math.max(0, this.weeklyGoal - weekHours);
+    const todayHours = this.calculateTodayHours();
+    const weekHours = this.calculateWeekHours();
+    
+    // CORRECTION: Inclure la journée en cours dans le calcul du restant
+    // Si on est en train de travailler, on compte les heures projetées
+    const projectedToday = this.startTime && !this.endTime ? 
+        this.calculateProjectedHours() : todayHours;
+    
+    // Total = heures de la semaine + heures d'aujourd'hui projetées
+    const totalWithToday = weekHours + projectedToday;
+    const remainingHours = Math.max(0, this.weeklyGoal - totalWithToday);
 
-                document.getElementById('todayHours').textContent = this.formatHours(todayHours);
-                document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
-                document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
-            }
+    document.getElementById('todayHours').textContent = this.formatHours(todayHours);
+    document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
+    document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
+}
+
 
             updateProgress() {
                 const todayHours = this.calculateTodayHours();
