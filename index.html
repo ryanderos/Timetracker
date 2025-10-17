@@ -810,13 +810,12 @@
                 // Attendre la fin de la pause déjeuner
                 if (this.breakStartTime && !this.breakEndTime) return null;
                 
-                // Calculer heures de la semaine SANS aujourd'hui
+                // Calculer heures de la semaine (DÉJÀ fait, incluant aujourd'hui jusqu'à maintenant)
                 const weekHours = this.calculateWeekHours();
-                const todayHours = this.calculateTodayHours();
-                const hoursBeforeToday = weekHours - todayHours;
                 
-                // Heures restantes à faire
-                const remainingHours = this.weeklyGoal - hoursBeforeToday;
+                // Heures restantes = Objectif - Heures déjà faites
+                const remainingHours = this.weeklyGoal - weekHours;
+
                 
                 if (remainingHours <= 0) {
                     return { canLeaveNow: true, remainingHours: 0, hoursBeforeToday };
@@ -827,6 +826,9 @@
                 const departureTime = new Date(now);
                 departureTime.setMinutes(departureTime.getMinutes() + (remainingHours * 60));
                 
+                const todayHours = this.calculateTodayHours();
+                const hoursBeforeToday = weekHours - todayHours;
+                
                 return {
                     canLeaveNow: false,
                     departureTime: departureTime,
@@ -834,6 +836,7 @@
                     hoursBeforeToday: hoursBeforeToday,
                     todayHours: todayHours
                 };
+
             }
         
             // Afficher l'encart de départ optimal
