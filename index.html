@@ -712,24 +712,45 @@
             }
 
             updateStats() {
-    const todayHours = this.calculateTodayHours();
-    const weekHours = this.calculateWeekHours();
-    
-    // FIX: Le "Restant" doit prendre en compte les heures projetées en temps réel
-    let projectedWeekTotal = weekHours;
-    
-    // Si on est en train de travailler, utiliser les heures projetées d'aujourd'hui
-    if (this.startTime && !this.endTime) {
-        const projectedToday = this.calculateProjectedHours ? this.calculateProjectedHours() : todayHours;
-        projectedWeekTotal = weekHours - todayHours + projectedToday;
+                const todayHours = this.calculateTodayHours();
+                const weekHours = this.calculateWeekHours();
+                
+                // Calculer les heures projetées en temps réel si on travaille
+                let projectedToday = todayHours;
+                if (this.startTime && !this.endTime) {
+                    // Calculer temps depuis la reprise de pause (ou début de journée)
+                    const now = new Date();
+                    let workMinutes = 0;
+                    
+                    if (this.breakEndTime) {
+                        // Après la pause : temps depuis la reprise
+                        workMinutes = (now - this.breakEndTime) / (1000 * 60);
+                        // Ajouter le temps d'avant la pause
+                        workMinutes += (this.breakStartTime - this.startTime) / (1000 * 60);
+                    } else if (this.breakStartTime) {
+                        // En pause : temps d'avant la pause
+                        workMinutes = (this.breakStartTime - this.startTime) / (1000 * 60);
+                    } else {
+                        // Pas de pause : temps depuis l'arrivée
+                        workMinutes = (now - this.startTime) / (1000 * 60);
+            }
+        
+        // Retirer les 15 min si cochées
+        const skip15min = document.getElementById('skip15min')?.checked;
+        if (skip15min) workMinutes -= 15;
+        
+        projectedToday = Math.max(0, workMinutes / 60);
     }
     
+    // Total semaine avec projection temps réel
+    const projectedWeekTotal = weekHours - todayHours + projectedToday;
     const remainingHours = Math.max(0, this.weeklyGoal - projectedWeekTotal);
 
-    document.getElementById('todayHours').textContent = this.formatHours(todayHours);
-    document.getElementById('weekHours').textContent = `${this.formatHours(weekHours)}/${this.weeklyGoal}h`;
+    document.getElementById('todayHours').textContent = this.formatHours(projectedToday);
+    document.getElementById('weekHours').textContent = `${this.formatHours(projectedWeekTotal)}/${this.weeklyGoal}h`;
     document.getElementById('remainingHours').textContent = this.formatHours(remainingHours);
 }
+
 
 
 
@@ -810,11 +831,13 @@
                 // Attendre la fin de la pause déjeuner
                 if (this.breakStartTime && !this.breakEndTime) return null;
                 
-                // Calculer heures de la semaine (DÉJÀ fait, incluant aujourd'hui jusqu'à maintenant)
-                const weekHours = this.calculateWeekHours();
-                
-                // Heures restantes = Objectif - Heures déjà faites
-                const remainingHours = this.weeklyGoal - weekHours;
+                // Calculer UNIQUEMENT les heures des jours PRÉCÉDENTS (lun-jeu)
+                const weekHours = this.calculateWeekHours(); // Total avec aujourd'hui
+                const todayHours = this.calculateTodayHours(); // Heures d'aujourd'hui
+                const hoursBeforeToday = weekHours - todayHours; // Heures lun-jeu uniquement
+            
+                // Heures restantes = Objectif - Heures avant aujourd'hui
+                const remainingHours = this.weeklyGoal - hoursBeforeToday;
 
                 
                 if (remainingHours <= 0) {
@@ -826,8 +849,6 @@
                 const departureTime = new Date(now);
                 departureTime.setMinutes(departureTime.getMinutes() + (remainingHours * 60));
                 
-                const todayHours = this.calculateTodayHours();
-                const hoursBeforeToday = weekHours - todayHours;
                 
                 return {
                     canLeaveNow: false,
