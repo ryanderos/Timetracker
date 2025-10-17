@@ -360,6 +360,8 @@
                 this.currentCalendarMonth = new Date();
                 this.userProfile = this.loadUserProfile();
                 this.settings = this.loadSettings();
+                this.cachedDepartureTime = null; // Cache pour l'heure de départ
+                this.lastDepartureCalculation = null;
                
                 this.initializeApp();
             }
@@ -830,6 +832,13 @@
                 
                 // Attendre la fin de la pause déjeuner
                 if (this.breakStartTime && !this.breakEndTime) return null;
+                const now = new Date();
+                if (this.cachedDepartureTime && this.lastDepartureCalculation) {
+                    const timeSinceLastCalc = (now - this.lastDepartureCalculation) / (1000 * 60);
+                    if (timeSinceLastCalc < 5) {
+                        return this.cachedDepartureTime; // Retourner le cache
+                    }
+                }
                 
                 // Calculer UNIQUEMENT les heures des jours PRÉCÉDENTS (lun-jeu)
                 const weekHours = this.calculateWeekHours(); // Total avec aujourd'hui
@@ -848,6 +857,20 @@
                 const now = new Date();
                 const departureTime = new Date(now);
                 departureTime.setMinutes(departureTime.getMinutes() + (remainingHours * 60));
+                // Sauvegarder en cache
+                const result = {
+                    canLeaveNow: false,
+                    departureTime: departureTime,
+                    remainingHours: remainingHours,
+                    hoursBeforeToday: hoursBeforeToday,
+                    todayHours: todayHours
+                };
+                
+                this.cachedDepartureTime = result;
+                this.lastDepartureCalculation = now;
+                
+                return result;
+
                 
                 
                 return {
